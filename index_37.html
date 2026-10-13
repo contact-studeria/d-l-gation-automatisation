@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Diagnostic d&eacute;l&eacute;gation et automatisation &mdash; Studeria</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+
+:root {
+  --purple: #7b1ad5;
+  --violet: #a155f8;
+  --light: #e8bbff;
+  --ultralight: #f5dcff;
+  --ink: #0f0038;
+  --soft: #4a4a6a;
+  --muted: #8888a8;
+  --surface: #ffffff;
+  --white: #ffffff;
+  --teal: #06B6D4;
+  --amber: #F59E0B;
+  --rose: #F43F5E;
+  --emerald: #10B981;
+  --blue: #3B82F6;
+  --border: #dbd9e1;
+  --radius: 12px;
+  --rlg: 20px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+  background: var(--surface);
+  line-height: 1.75;
+}
+
+.sidebar {
+  position: fixed; top: 0; left: 0;
+  width: 280px; height: 100vh;
+  background: var(--ink);
+  padding: 24px 16px;
+  overflow-y: auto;
+  z-index: 100;
+  transition: transform .3s;
+}
+.sidebar .logo { font-size: 19px; color: #fff; font-weight: 700; }
+.sidebar .sub {
+  font-size: 10px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 2px;
+  margin: 4px 0 20px;
+}
+.nav-section {
+  font-size: 10px; color: var(--violet);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  padding: 12px 13px 4px; font-weight: 700;
+}
+.sidebar a {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 13px; margin-bottom: 2px;
+  color: rgba(255,255,255,.5);
+  text-decoration: none; font-size: 12.5px; font-weight: 500;
+  border-radius: 7px; transition: .2s;
+}
+.sidebar a:hover, .sidebar a.active { background: rgba(123,26,213,.2); color: #fff; }
+.sidebar .n { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--violet); min-width: 18px; }
+.sidebar .div { height: 1px; background: rgba(255,255,255,.06); margin: 10px 0; }
+
+.toggle {
+  display: none; position: fixed; top: 12px; left: 12px; z-index: 200;
+  background: var(--purple); color: #fff; border: none;
+  border-radius: 8px; padding: 8px 12px; font-size: 18px; cursor: pointer;
+}
+
+.main { margin-left: 280px; min-height: 100vh; }
+
+.hero {
+  background: linear-gradient(135deg, #0f0038 0%, #7b1ad5 50%, #e08aff 100%);
+  padding: 80px 50px 65px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -40%; right: -15%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(123,26,213,.3), transparent 70%);
+  border-radius: 50%;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: -25%; left: 8%;
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(224,138,255,.15), transparent 70%);
+  border-radius: 50%;
+}
+.hero-c { position: relative; z-index: 1; max-width: 720px; }
+.badge {
+  display: inline-block;
+  background: rgba(123,26,213,.3); color: var(--light);
+  padding: 5px 14px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  margin-bottom: 18px;
+  border: 1px solid rgba(123,26,213,.4);
+}
+.hero h1 {
+  font-size: clamp(30px, 4.5vw, 48px);
+  color: #fff; font-weight: 700; line-height: 1.15;
+  margin-bottom: 14px;
+}
+.hero h1 em { color: var(--teal); font-style: normal; }
+.hero-c > p {
+  font-size: 16px; color: rgba(255,255,255,.65);
+  max-width: 560px; margin-bottom: 24px;
+}
+.hero-tags { display: flex; gap: 16px; flex-wrap: wrap; }
+.hero-tags span { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,.45); font-size: 12px; }
+.hero-tags .ic {
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,.07); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+.content { max-width: 840px; margin: 0 auto; padding: 50px 32px 100px; }
+
+.ch { margin-bottom: 56px; scroll-margin-top: 20px; }
+.ch-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.ch-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  color: var(--purple); background: var(--light);
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 9px; flex-shrink: 0;
+}
+.ch h2 { font-size: 24px; font-weight: 700; }
+
+.card {
+  background: var(--white); border-radius: var(--rlg);
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(123,26,213,.06);
+  border: 1px solid var(--border);
+}
+.card p { margin-bottom: 14px; color: var(--soft); font-size: 15px; }
+.card p:last-child { margin-bottom: 0; }
+.card strong { color: var(--ink); font-weight: 600; }
+.card h3 {
+  font-size: 19px; font-weight: 600; color: var(--ink);
+  margin: 26px 0 10px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.card h3:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+.card h4 { font-size: 14px; font-weight: 700; color: var(--purple); margin: 18px 0 6px; }
+.card ul { margin: 0 0 14px 20px; color: var(--soft); font-size: 15px; }
+.card li { margin-bottom: 4px; }
+
+.analogy {
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  border-radius: var(--radius); padding: 20px 24px;
+  margin: 18px 0; border-left: 4px solid var(--amber);
+}
+.analogy .al { font-weight: 700; color: #92400E; font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.analogy p { font-size: 14px; color: #78350F; margin: 0; }
+
+.prereq {
+  background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+  border-radius: var(--radius); padding: 20px 24px;
+  margin: 18px 0; border-left: 4px solid var(--blue);
+}
+.prereq .pl { font-weight: 700; color: #1E40AF; font-size: 13px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.prereq p, .prereq li { font-size: 14px; color: #1E3A5F; margin: 0; }
+.prereq ul { list-style: none; padding: 0; margin: 6px 0 0; }
+.prereq li { padding: 4px 0 4px 20px; position: relative; }
+.prereq li::before { content: '\2611'; position: absolute; left: 0; }
+
+.warning-big {
+  background: linear-gradient(135deg, #FEE2E2, #FECACA);
+  border-radius: var(--radius); padding: 20px 24px;
+  margin: 18px 0; border-left: 4px solid var(--rose);
+}
+.warning-big .wl { font-weight: 700; color: #991B1B; font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.warning-big p { font-size: 14px; color: #7F1D1D; margin: 0; }
+
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 16px 0; }
+.steps li {
+  counter-increment: s; position: relative;
+  padding: 14px 14px 14px 50px; margin-bottom: 8px;
+  background: var(--white); border-radius: var(--radius);
+  border: 1px solid var(--border);
+  font-size: 14px; color: var(--soft); transition: .15s;
+}
+.steps li:hover { transform: translateX(2px); box-shadow: 0 2px 8px rgba(123,26,213,.05); }
+.steps li::before {
+  content: counter(s); position: absolute;
+  left: 12px; top: 50%; transform: translateY(-50%);
+  width: 24px; height: 24px;
+  background: var(--purple); color: #fff;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+.steps li strong { color: var(--ink); }
+
+.mock {
+  background: #0f0038; border-radius: var(--radius);
+  overflow: hidden; margin: 20px 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.05);
+}
+.mock-bar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 12px; background: rgba(0,0,0,.3);
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot.r { background: #ff5f57; }
+.dot.y { background: #ffbd2e; }
+.dot.g { background: #28c840; }
+.mock-url { margin-left: 12px; font-size: 10.5px; color: rgba(255,255,255,.3); font-family: 'JetBrains Mono', monospace; }
+.mock-body { padding: 16px; min-height: 120px; }
+
+.tw { overflow-x: auto; margin: 16px 0; border-radius: var(--radius); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+thead { background: var(--ink); }
+thead th { padding: 11px 14px; text-align: left; color: #fff; font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: .4px; }
+tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--soft); vertical-align: top; }
+tbody tr:nth-child(even) { background: var(--ultralight); }
+
+.tip { display: flex; gap: 12px; padding: 16px 20px; border-radius: var(--radius); margin: 16px 0; border-left: 4px solid; }
+.tip.info { background: #EFF6FF; border-color: var(--blue); }
+.tip.ok { background: #ECFDF5; border-color: var(--emerald); }
+.tip.warn { background: #FFFBEB; border-color: var(--amber); }
+.tip.err { background: #FFF1F2; border-color: var(--rose); }
+.tip-i { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+.tip-c { font-size: 13.5px; color: var(--soft); }
+.tip-c strong { color: var(--ink); display: block; margin-bottom: 2px; }
+
+.vg { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 16px 0; }
+.vc { background: var(--white); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); transition: .15s; }
+.vc:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(123,26,213,.07); }
+.vc .vt { font-weight: 700; color: var(--purple); font-size: 13.5px; margin-bottom: 3px; }
+.vc .vd { font-size: 12.5px; color: var(--soft); }
+.vc .ve { font-size: 11.5px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+.flow { display: flex; align-items: center; gap: 0; margin: 20px 0; flex-wrap: wrap; justify-content: center; }
+.flow-node { background: var(--white); border: 2px solid var(--border); border-radius: 14px; padding: 12px 18px; text-align: center; min-width: 120px; transition: .15s; }
+.flow-node:hover { border-color: var(--purple); box-shadow: 0 4px 14px rgba(123,26,213,.08); }
+.flow-node .fl { font-size: 22px; margin-bottom: 4px; }
+.flow-node .fn2 { font-weight: 700; font-size: 12.5px; color: var(--ink); }
+.flow-node .fd { font-size: 10.5px; color: var(--muted); }
+.flow-node.trigger { border-color: var(--emerald); background: #ECFDF5; }
+.flow-node.action { border-color: var(--blue); background: #EFF6FF; }
+.flow-node.ai { border-color: var(--purple); background: var(--ultralight); }
+.flow-arrow { font-size: 22px; color: var(--muted); padding: 0 6px; flex-shrink: 0; }
+
+.code {
+  background: #0f0038; color: #e2e8f0;
+  padding: 14px 18px; border-radius: var(--radius);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px; margin: 12px 0;
+  overflow-x: auto; line-height: 1.6;
+}
+.code .cm { color: #6b7280; }
+.code .kw { color: var(--teal); }
+.code .str { color: #fbbf24; }
+
+.annotated { background: var(--ultralight); border: 1px solid rgba(123,26,213,.1); border-radius: var(--radius); padding: 24px; margin: 18px 0; }
+.annotated .caption { font-size: 11.5px; color: var(--muted); text-align: center; margin-top: 10px; font-style: italic; }
+
+.task-list { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; padding: 16px; background: var(--ultralight); border-radius: var(--radius); }
+.task-list div { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--soft); }
+
+.footer { text-align: center; padding: 36px; color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--border); margin-top: 36px; }
+
+@media (max-width: 800px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .toggle { display: block; }
+  .main { margin-left: 0; }
+  .hero { padding: 70px 20px 45px; }
+  .content { padding: 28px 16px 60px; }
+  .card { padding: 22px; }
+  .flow { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+}
+
+@media print {
+  .sidebar, .toggle, .hero { display: none !important; }
+  .main { margin-left: 0 !important; }
+  .ch { break-inside: avoid; }
+  .card { box-shadow: none !important; border: 1px solid #ddd; }
+}
+
+
+/* ================= MODELE V3 ================= */
+:root{--accent:#3B82F6;--accent-soft:#bfdbfe;--em:#FDE68A}
+.progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:300;
+  background:linear-gradient(90deg,var(--purple),var(--accent));transition:width .1s linear}
+
+.sidebar .brand{display:flex;align-items:center;gap:11px;margin-bottom:20px}
+.sidebar .brand img{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;
+  border:2px solid var(--accent);box-shadow:0 0 0 4px rgba(255,255,255,.07)}
+.sidebar .brand .bt{min-width:0}
+.sidebar .brand .logo{font-size:14.5px;line-height:1.25;margin:0}
+.sidebar .brand .sub{margin:2px 0 0;letter-spacing:.8px;font-size:9.5px;white-space:nowrap;color:var(--accent)}
+.nav-section{color:var(--accent)}
+.sidebar .n{color:var(--accent)}
+.sidebar a{position:relative}
+.sidebar a:hover,.sidebar a.active{background:rgba(255,255,255,.08);color:#fff}
+.sidebar a.active::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:3px;
+  border-radius:0 3px 3px 0;background:var(--accent)}
+
+/* --- hero --- */
+.hero{padding:58px 50px 54px;
+  background:linear-gradient(118deg,#0f0038 0%,var(--purple) 34%,var(--accent) 88%)}
+.hero::before{top:-30%;right:-10%;width:560px;height:560px;
+  background:radial-gradient(circle,rgba(59,130,246,.55),transparent 68%)}
+.hero::after{bottom:-34%;left:-8%;width:480px;height:480px;
+  background:radial-gradient(circle,rgba(59,130,246,.32),transparent 70%)}
+.hero-grid{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);
+  background-size:52px 52px;
+  -webkit-mask-image:radial-gradient(ellipse at 30% 50%,#000 10%,transparent 72%);
+  mask-image:radial-gradient(ellipse at 30% 50%,#000 10%,transparent 72%)}
+.hero-inner{position:relative;z-index:1;max-width:1120px;margin:0 auto;
+  display:flex;align-items:center;gap:44px}
+.hero-inner>.hero-c{flex:1 1 520px;min-width:0;max-width:600px}
+.hero h1 em{color:var(--em);font-style:normal}
+.hero h1{margin-bottom:12px}
+.hero-c>p{margin-bottom:18px}
+.hero-visual{flex:0 1 370px;min-width:0;position:relative;align-self:center;
+  display:flex;align-items:flex-end;justify-content:center}
+.hero-visual::before{content:'';position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);width:330px;height:330px;max-width:96%;
+  aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.22),rgba(255,255,255,.06) 58%,transparent 70%);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:inset 0 0 60px rgba(255,255,255,.10)}
+.hero-visual::after{content:'';position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);width:400px;height:400px;max-width:115%;
+  aspect-ratio:1;border-radius:50%;border:1px dashed rgba(255,255,255,.14);
+  animation:spin 46s linear infinite}
+.hero-visual img{position:relative;z-index:1;width:340px;max-width:100%;display:block;
+  filter:drop-shadow(0 22px 40px rgba(0,0,0,.45));animation:floaty 7s ease-in-out infinite}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+/* --- bandeau logos du hero --- */
+.hero-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:18px 0 22px}
+.hero-tools .hl{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;
+  color:rgba(255,255,255,.82);font-weight:700;margin-right:4px}
+.hero-tools .ht{display:inline-flex;align-items:center;gap:7px;
+  background:#fff;border:1px solid rgba(255,255,255,.7);
+  border-radius:999px;padding:6px 14px 6px 10px;font-size:12.5px;font-weight:600;
+  color:#1b1040;box-shadow:0 4px 14px rgba(15,0,56,.22)}
+.hero-tools .ht svg{display:block;flex-shrink:0}
+.hero-tools .ht .ltr{box-shadow:none}
+
+/* lisibilite du bandeau d'informations */
+.hero-tags{gap:14px 20px}
+.hero-tags span{color:rgba(255,255,255,.92);font-size:12.5px;font-weight:500}
+.hero-tags .ic{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22)}
+.badge{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff}
+.hero-c>p{color:rgba(255,255,255,.88)}
+
+/* --- cartes connecteurs --- */
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin:18px 0}
+.tool{display:flex;gap:13px;background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius);padding:15px 16px;transition:.15s}
+.tool:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(123,26,213,.10)}
+.tico{width:40px;height:40px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center}
+.tname{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;
+  gap:7px;flex-wrap:wrap;line-height:1.3}
+.mcp{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  padding:2px 7px;border-radius:5px;background:#ECFDF5;color:#047857;border:1px solid #a7f3d0}
+.mcp.no{background:#FFF7ED;color:#9A3412;border-color:#fed7aa}
+.tdesc{font-size:12.5px;color:var(--soft);margin-top:4px;line-height:1.55}
+.ltr{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;
+  color:#fff;font-weight:700;font-size:12px;font-family:'Inter',sans-serif}
+
+/* --- sommaire --- */
+.toc{margin:-18px 0 44px}
+.toc-t{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);
+  font-weight:700;margin-bottom:12px}
+.toc-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:10px}
+.toc-g a{display:flex;align-items:center;gap:10px;text-decoration:none;background:#fff;
+  border:1px solid var(--border);border-radius:var(--radius);padding:11px 14px;transition:.15s}
+.toc-g a:hover{border-color:var(--accent);transform:translateY(-2px);
+  box-shadow:0 6px 18px rgba(123,26,213,.10)}
+.toc-g .tn{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;
+  color:#fff;background:linear-gradient(135deg,var(--purple),var(--accent));border-radius:7px;
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toc-g .tt{font-size:13px;font-weight:600;color:var(--ink);line-height:1.35}
+
+/* --- chapitres --- */
+.ch{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+.ch.vis{opacity:1;transform:none}
+.ch-head{padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:22px}
+.ch-num{width:36px;height:36px;font-size:12px;color:#fff;
+  background:linear-gradient(135deg,var(--purple),var(--accent));
+  box-shadow:0 4px 12px rgba(123,26,213,.28)}
+.ch h2{font-size:25px;letter-spacing:-.3px}
+.card{box-shadow:0 6px 22px rgba(123,26,213,.07)}
+
+/* --- mascotte dans les conseils --- */
+.tip{position:relative}
+.tip-av{width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;
+  border:2px solid #fff;box-shadow:0 2px 8px rgba(15,0,56,.18)}
+
+/* --- bouton copier --- */
+.codewrap{position:relative;margin:12px 0}
+.codewrap .code{margin:0;padding-right:96px}
+.copybtn{position:absolute;top:10px;right:10px;z-index:2;cursor:pointer;
+  border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.10);color:#fff;
+  border-radius:8px;padding:5px 11px;font-size:11.5px;font-weight:600;
+  font-family:'Inter',sans-serif;transition:.15s}
+.copybtn:hover{background:rgba(255,255,255,.2)}
+.copybtn.done{background:#10B981;border-color:#10B981}
+
+/* --- quiz --- */
+.quiz{display:flex;flex-direction:column;gap:14px;margin:18px 0}
+.q{border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;background:#fff}
+.q .qq{font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:12px}
+.q .qq .qn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);margin-right:8px}
+.q button.opt{display:block;width:100%;text-align:left;cursor:pointer;
+  background:#fff;border:1px solid var(--border);border-radius:9px;
+  padding:10px 14px;margin-bottom:7px;font-size:13.5px;color:var(--soft);
+  font-family:'Inter',sans-serif;transition:.15s}
+.q button.opt:hover{border-color:var(--accent);background:#fcfaff}
+.q button.opt.good{background:#ECFDF5;border-color:#10B981;color:#065F46;font-weight:600}
+.q button.opt.bad{background:#FFF1F2;border-color:#F43F5E;color:#9F1239}
+.q .exp{display:none;font-size:13px;color:var(--soft);background:var(--ultralight);
+  border-radius:9px;padding:11px 14px;margin-top:6px}
+.q.answered .exp{display:block}
+.qscore{font-size:13.5px;font-weight:700;color:var(--ink);background:var(--ultralight);
+  border-radius:var(--radius);padding:13px 18px;text-align:center}
+
+/* --- retour en haut --- */
+.top{position:fixed;right:22px;bottom:22px;z-index:200;width:42px;height:42px;
+  border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:17px;
+  background:linear-gradient(135deg,var(--purple),var(--accent));
+  box-shadow:0 6px 18px rgba(123,26,213,.35);
+  opacity:0;pointer-events:none;transition:opacity .25s}
+.top.show{opacity:1;pointer-events:auto}
+
+@media (max-width:1100px){
+  .hero-visual{flex:0 1 280px}
+  .hero-visual img{width:260px}
+  .hero-visual::before{width:250px;height:250px}
+  .hero-visual::after{width:305px;height:305px}
+}
+@media (max-width:900px){
+  .hero{padding:64px 20px 44px}
+  .hero-inner{flex-direction:column;align-items:flex-start;gap:14px}
+  .hero-visual{flex:none;align-self:center}
+  .hero-visual img{width:230px;max-width:62vw}
+  .hero-visual::before{width:230px;height:230px}
+  .hero-visual::after{width:275px;height:275px}
+  .hero-grid{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-visual img{animation:none}
+  .ch{opacity:1;transform:none;transition:none}
+}
+@media print{.progress,.top,.copybtn{display:none!important}}
+
+.toolico{border-radius:5px;vertical-align:middle;object-fit:contain}
+.kitbox{border:1px solid var(--border);border-radius:var(--rlg);padding:18px 20px;margin:18px 0;background:var(--ultralight)}
+.kitbox .kl{font-weight:700;color:var(--purple);margin-bottom:6px}
+.kitbox ol{margin:8px 0 0 18px}.kitbox li{margin:6px 0}
+.filelink{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:13px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--purple);word-break:break-all}
+</style>
+</head>
+<body>
+<div class="progress"></div>
+
+<button class="toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+
+<nav class="sidebar">
+  <div class="brand"><img src="data:image/jpeg;base64,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" alt=""><div class="bt"><div class="logo">&#128218; Agent Diagnostic d&eacute;l&eacute;gation et automatisation</div><div class="sub">Kit Organisation &middot; Studeria</div></div></div>
+
+  <div class="nav-section">&#127937; D&eacute;couvrir</div>
+  <a href="#ch0"><span class="n">00</span>&Agrave; quoi sert cet agent</a>
+  <a href="#ch1"><span class="n">01</span>Ce qu'il produit</a>
+
+  <div class="div"></div>
+
+  <div class="nav-section">&#129513; Comprendre</div>
+  <a href="#ch2"><span class="n">02</span>Les 4 briques d'un agent</a>
+
+  <div class="div"></div>
+
+  <div class="nav-section">&#128295; Installer</div>
+  <a href="#ch3"><span class="n">03</span>Le prompt d'initialisation</a>
+  <a href="#ch4"><span class="n">04</span>Connecter vos outils</a>
+
+  <div class="div"></div>
+
+  <div class="nav-section">&#9889; Utiliser</div>
+  <a href="#ch5"><span class="n">05</span>Le lancer &agrave; la main</a>
+  <a href="#ch6"><span class="n">06</span>Le mettre en automatique</a>
+
+  <div class="div"></div>
+
+  <div class="nav-section">&#127891; Ma&icirc;triser</div>
+  <a href="#ch7"><span class="n">07</span>Ce qu'il ne fait pas</a>
+  <a href="#ch8"><span class="n">08</span>Si &ccedil;a ne marche pas</a>
+  <a href="#ch9"><span class="n">09</span>R&eacute;cap et exercices</a>
+  <a href="#ch10"><span class="n">10</span>Quiz de fin</a>
+</nav>
+
+<div class="main">
+
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+  <div class="hero-c">
+    <span class="badge">&#128214; Guide agent Studeria &middot; D&eacute;butant</span>
+    <h1>Votre agent de <em>d&eacute;l&eacute;gation et d'automatisation</em></h1>
+    <p>Deux semaines d'agenda et de messagerie lues, le temps reconstitu&eacute;, puis tri&eacute; en quatre cases&nbsp;: &agrave; garder, &agrave; d&eacute;l&eacute;guer, &agrave; automatiser, &agrave; supprimer. Chaque case chiffr&eacute;e en heures, chaque ligne avec sa source, et un seul premier chantier.</p>
+    <div class="hero-tools"><span class="hl">Se branche avec</span><span class="ht"><img class="toolico" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAMAAADVRocKAAABGlBMVEUAAABAgP9DhvVBhvRChfRChfQZZ9IZZ9EZaNMYZtNAivRDhfQaZ9IVatVBhvQZaNJDhfMZaNEaZ9FChfQZZ9L////7vATx9v6myfaCs/Jin+9XmO57rvK41Pj7/f/i7fzG3PmYwPUofOkac+gwgOq00fifxPUhd+l0qvGRu/Tt9P2UvvQleulFjew3heu81vjD2vkzguvp8v34+/7f6/xMku1QlO2GtfMedegsfupTlu5JkO2tzfd/sPKJt/O/2PmNufTX5/s6h+uqy/abwvXJ3vpwqPH0+P4+ieyxz/dtpvBbm+5ene/U5ftlofDN4PoYgDg0qFPqQzXqRDUYgDgXgDgggEAYgDgagDkXgDcAgEAZgTgYgDgYgDg1l7sXAAAAXnRSTlMABGO73///z5tLGM+fDL+7a1Oz79///////////////////////////////////////////////////////////////////////////////////4/bgxDjKM8Ee8PzvzhR0gAAAcJJREFUeAHt1oWu20AQheEppMzthPmEmXOZqQxbhvd/ja59mS1rRhDtbxTtJ1qgWcvlct24eet2JER3TnT33n26rAcPI0eFBmyPHtPFPYlIALandGHPIjKA7Tld1C054AVd1Es54BVdVEQKsMkBDnCAAxzAAYueywEOmEEgFk8kU+lMlk+Wy+djMkC2UIRfqczHVapAXgao4ag6H9RIAlJAE7ZWuwOvLvv1+hADBlUAiSHzaAxgwrbsdA6CwHQeC+wVmwdgpcYibHNCgG24lGO/JADvdwHA8ooccNQEQMx+c635VV6TB9arwAZ7dQesAGQ6AJb4IGFgdaHdgm2ZlYBN+G2xMtAvawHbOzuTImxbSoDXsDkHzI3UAFsBwI4msDsH7MkDw9dNPqgEzIkDayVUY+w3ALAhDrwB8DbLXu8AJMWB93MAxquNRncMW08c4BWc6APLA5zGUaldDYC7e/DrV9TWoo+F5cRWzx0dHTD7wKdzfQ7Yl7MZZcCQLmBIFzCkCxjSBQzpAoZ0AUO6gCFdwJAuYEgXMKQLGLqur+GBQOPTt/BAoPHp+4/wgKEg/fwVFjAUrN9//v4LAxhyuVyz3X/dV4hAn5ff5AAAAABJRU5ErkJggg==" width="18" height="18" alt="">Google Agenda</span><span class="ht"><img class="toolico" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAEkklEQVR4Ae2ZA5BkSRRFc23bv7H2Fta72V7btm3bDq3tsdkY27b9a9xmTr6IyXB0Z1W/6j8/+56IGzOB1jsdpzp+CQMAAAAAAAAAAAAAAACAEZ53xvDMoz8ekXXMqBGZxyyiDc88pnhExjHvj/S8E0Q7pW7gTtH64h0/ry/ZcVhDyQ6LaPT/+tIdX68ZtEu2aC2js484Uh+7l55qZvUjM4/+btBxhx8o2gnVg3b16kp2+k8fWzU3LeQ3NUjsK1JB/8ZfoI+7QU9ZLjHS84qE4+ij3qyPW66nLLesdsDOyVViZNaR2Toxq+iwyY6yNEiKHYVjqEFi14biHb6joyY7naRZapCwL8TW1qtUR68PYz3vUOEI1HN9yEl6KtVRsoQNw7I9aQ7ZSgmr9GtDnvPJsV+91QuzPl4nPcW1NXmRd5WUoUvSIil3XXvVGX/T8bhGfzHZCJjGKcDPi6lEXqzYl7HQJMmXZ2Xr73uSHh2Oc71sBFQzCzBbtbogts0nSX+fN/t58XL6nrkF0IuxjQCVJgG0+kRu9G2eJPEnJ5Ef/c58r9wCzIIWwJwk/uS4LoA1SfzJcV8Aa5L4k+O+AIYk8SYHAhiSxJAcCEh3knx58p768/9kvhYEtGGSVhdGT/FzY9Poc2/zAp58oMvYYVlZAQngT5LOzd0mOUEKqCzeRd3fRY4ULZH7YYW6+cVJS/qeenYAAtiSZJLzm/lcQQpYNGAfVdjh8uXR/69XVgJol7zrV/1+0W0sAhg2aJ08+8j0J4dfQL8+x6hzO1xbQ8dPSoDZezd+oShJAQugJdbkx4v4k8MvwCTnw+4RZQ6fsgDag48Xq/6nRBgEMCw39jEliS85/AIoObd2yqeD8wigXf36YvXnBTdzCGBYfBgliSE57AIoORd1uJqOzSuAlv/BRvXB9Z9RkngEMCSp2eQwrBXJ4Rdgdt+TgxT9lWQpINRrZXL4BZhd8dYyRX8luS/APjn8Aiz2zk3fUJJcFWCbnOAE0O55aiglyUUBFskJXIBJ0opGSpJjAmyTE7wAs7dv/qaRkuSUAPvkBC+AdssLkxOUJFcEUHKu71RYRQcMhQBawQcbN/4s75kfdgFde2cuOuf/66rpeKESYEZPM+mpZgiPX53Iiz5sDhdaAUJDz/Xp+X5ojp8fn+cXxM4QGicEEPQOF73TFQIB/9GDPUG4JICgp5j8SeJNjjC4KIDgTxJvctwXwJ8k1uS4L4A/SazJcV8AZ5IYkgMBDEliSA4EpD9J8XK9+4UBAtouSfR+Mb1vLAgIaPMk/WafHAjgSpJJzt3CAAGpk8iPSn3UZezJgQB7VsrIgfq4/ZJNDgQw4+fGX6YkWScHAvjx8yMXUJIYkgMBDEliTQ4E8AMBEAABEAABEAABEAABEAABEAABQQEBEDDLQkDlPAhIk4D/rv+rZQEflL8PAekREPv/httFS8h3NuyrD7eMUwAE0PGv7yVskR9tPiHvw4pJbAIgYFqs442HimSQ76gd9evB6zkfVg7T/5ZDQGqHj3S47nn52z27CgAAAAAAAAAAAAAAAAAAtFu2AJlqODQM4+yVAAAAAElFTkSuQmCC" width="18" height="18" alt="">Gmail</span><span class="ht"><img class="toolico" src="data:image/png;base64,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" width="18" height="18" alt="">Google Drive</span><span class="ht"><img class="toolico" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAACM0lEQVR4nO3cMW5TQRSF4TMzjyjBiRFFvABaJCRKpCCLHVClYgfsAYVFsAI6U1FCg6JEoo9EywZSIBw5cay8uSkghWUKm+bXwPnaae7ot+dpmknTl49CjYhQP9zKZbqopw8+fn8e43F3dHSsty908+aTTrZ3dXA9Uy+p0LOuK9MD/O8cAOYAMAeAOQDMAWAOAHMAmAPAHADmADAHgDkAzAFgDgBzAJgDwBwA5gAwB4A5AMwBYA4AcwCYA8AcAOYAMAeAOQDMAWAOAHMAmAPAHADmADAHgDkAzAFgDgBzAJgDwBwA1kWop4fYwN2sdWUlVEPqk9Q38/aCpG64lZt5V6FWFd3L0qLfW1lM2tsZqKhXSc3sSOqmi3pKD7GBOszKOaUzSdJoFI/Pf68kfb2aaXY9V1X4aLU1pRiPO3qIjY2OI31Y/nZNJirf9pWokf5W0pdoL8C5QodpKUBMVNRgAIMlvf9xQg+xgaqdYdZ8eqZXD19rEiWUlA7Vx2e907ae6FJVqZ2PcKf7wwN6iLXVG2mQpasYSNLSkRN6pl09Vaip62Wny59tXcRyKVK6WFkJXWimXvO23ozrlBq6tkRISkV/+o3/Onbu9tLMnhr6s/6bHADmADAHgDkAzAFgDgBzAJgDwBwA5gAwB4A5AMwBYA4AcwCYA8AcAOYAMAeAOQDMAWAOAHMAmAPAHADmADAHgDkAzAFgDgBzAJgDwBwA5gAwB4A5AMwBYA4AcwCYA8AcAHYLYOlm1RkSAKIAAAAASUVORK5CYII=" width="18" height="18" alt="">Microsoft 365</span></div>
+    <div class="hero-tags"><span><span class="ic">&#127919;</span>Aucun pr&eacute;requis technique</span><span><span class="ic">&#9203;</span>15 minutes de lecture</span><span><span class="ic">&#128269;</span>Chaque ligne avec sa source</span><span><span class="ic">&#129302;</span>Kit Organisation</span></div>
+  </div>
+  <div class="hero-visual"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNDAgMzgwIiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjM4MCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJEZXV4IHNlbWFpbmVzIGQgYWdlbmRhIHRyaWVlcyBlbiBxdWF0cmUgY2FzZXMgZ2FyZGVyIGRlbGVndWVyIGF1dG9tYXRpc2VyIHN1cHByaW1lciI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImNhcmQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9Ii45OCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmNWRjZmYiIHN0b3Atb3BhY2l0eT0iLjkiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8ZmlsdGVyIGlkPSJzaCIgeD0iLTQwJSIgeT0iLTQwJSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMTgwJSI+CiAgICAgIDxmZURyb3BTaGFkb3cgZHg9IjAiIGR5PSI5IiBzdGREZXZpYXRpb249IjEwIiBmbG9vZC1jb2xvcj0iIzBmMDAzOCIgZmxvb2Qtb3BhY2l0eT0iLjM0Ii8+CiAgICA8L2ZpbHRlcj4KICA8L2RlZnM+CgogIDwhLS0gbGEgbWF0aWVyZSBwcmVtaWVyZSA6IGRldXggc2VtYWluZXMgLS0+CiAgPGcgZmlsdGVyPSJ1cmwoI3NoKSI+CiAgICA8cmVjdCB4PSIxNCIgeT0iMTQiIHdpZHRoPSIzMTIiIGhlaWdodD0iNjIiIHJ4PSIxMiIgZmlsbD0iIzdiMWFkNSIvPgogIDwvZz4KICA8ZyBmb250LWZhbWlseT0iSW50ZXIsc3lzdGVtLXVpLHNhbnMtc2VyaWYiPgogICAgPHRleHQgeD0iMzAiIHk9IjM2IiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNlOGJiZmYiPkRFVVggU0VNQUlORVMgTFVFUzwvdGV4dD4KICAgIDx0ZXh0IHg9IjMwIiB5PSI1NiIgZm9udC1zaXplPSIxMSIgZmlsbD0iI2ZmZmZmZiI+YWdlbmRhIMK3IG1lc3NhZ2VyaWUgwrcgZW4gbGVjdHVyZTwvdGV4dD4KICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0NiwyOCkiPgogICAgICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iOCIgaGVpZ2h0PSIyNiIgcng9IjIiIGZpbGw9IiNlOGJiZmYiIGZpbGwtb3BhY2l0eT0iLjU1Ii8+CiAgICAgIDxyZWN0IHg9IjEyIiB5PSI2IiB3aWR0aD0iOCIgaGVpZ2h0PSIyMCIgcng9IjIiIGZpbGw9IiNlOGJiZmYiIGZpbGwtb3BhY2l0eT0iLjc1Ii8+CiAgICAgIDxyZWN0IHg9IjI0IiB5PSIyIiB3aWR0aD0iOCIgaGVpZ2h0PSIyNCIgcng9IjIiIGZpbGw9IiNmZmZmZmYiLz4KICAgICAgPHJlY3QgeD0iMzYiIHk9IjEwIiB3aWR0aD0iOCIgaGVpZ2h0PSIxNiIgcng9IjIiIGZpbGw9IiNlOGJiZmYiIGZpbGwtb3BhY2l0eT0iLjYiLz4KICAgICAgPHJlY3QgeD0iNDgiIHk9IjQiIHdpZHRoPSI4IiBoZWlnaHQ9IjIyIiByeD0iMiIgZmlsbD0iI2U4YmJmZiIgZmlsbC1vcGFjaXR5PSIuODUiLz4KICAgIDwvZz4KICA8L2c+CgogIDwhLS0gZmxlY2hlIC0tPgogIDxwYXRoIGQ9Ik0xNzAgODIgTDE3MCA5NCIgc3Ryb2tlPSIjN2IxYWQ1IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTE2NSA5MCBMMTcwIDk2IEwxNzUgOTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMWFkNSIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgoKICA8IS0tIGxlcyBxdWF0cmUgY2FzZXMgLS0+CiAgPGcgZmlsdGVyPSJ1cmwoI3NoKSI+CiAgICA8cmVjdCB4PSIxNCIgeT0iMTAyIiB3aWR0aD0iMTUyIiBoZWlnaHQ9Ijk0IiByeD0iMTEiIGZpbGw9InVybCgjY2FyZCkiLz4KICAgIDxyZWN0IHg9IjE3NCIgeT0iMTAyIiB3aWR0aD0iMTUyIiBoZWlnaHQ9Ijk0IiByeD0iMTEiIGZpbGw9InVybCgjY2FyZCkiLz4KICAgIDxyZWN0IHg9IjE0IiB5PSIyMDYiIHdpZHRoPSIxNTIiIGhlaWdodD0iOTQiIHJ4PSIxMSIgZmlsbD0idXJsKCNjYXJkKSIvPgogICAgPHJlY3QgeD0iMTc0IiB5PSIyMDYiIHdpZHRoPSIxNTIiIGhlaWdodD0iOTQiIHJ4PSIxMSIgZmlsbD0idXJsKCNjYXJkKSIvPgogIDwvZz4KCiAgPGcgZm9udC1mYW1pbHk9IkludGVyLHN5c3RlbS11aSxzYW5zLXNlcmlmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDkwLDEwMikiPgogICAgICA8dGV4dCB5PSIzMCIgZm9udC1zaXplPSIxOCI+8J+RkTwvdGV4dD4KICAgICAgPHRleHQgeT0iNTIiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwZjAwMzgiPsOAIGdhcmRlcjwvdGV4dD4KICAgICAgPHJlY3QgeD0iLTQzIiB5PSI2MCIgd2lkdGg9Ijg2IiBoZWlnaHQ9IjgiIHJ4PSI0IiBmaWxsPSIjN2IxYWQ1IiBmaWxsLW9wYWNpdHk9Ii4xOCIvPjxyZWN0IHg9Ii00MyIgeT0iNjAiIHdpZHRoPSI4NiIgaGVpZ2h0PSI4IiByeD0iNCIgZmlsbD0iIzdiMWFkNSIvPgogICAgICA8dGV4dCB5PSI4NCIgZm9udC1zaXplPSI4LjUiIGZpbGw9IiM1YjRiNzQiPmhldXJlcyAvIHNlbWFpbmU8L3RleHQ+CiAgICA8L2c+CiAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNTAsMTAyKSI+CiAgICAgIDx0ZXh0IHk9IjMwIiBmb250LXNpemU9IjE4Ij7wn6SdPC90ZXh0PgogICAgICA8dGV4dCB5PSI1MiIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzBmMDAzOCI+w4AgZMOpbMOpZ3VlcjwvdGV4dD4KICAgICAgPHJlY3QgeD0iLTQzIiB5PSI2MCIgd2lkdGg9Ijg2IiBoZWlnaHQ9IjgiIHJ4PSI0IiBmaWxsPSIjN2IxYWQ1IiBmaWxsLW9wYWNpdHk9Ii4xOCIvPjxyZWN0IHg9Ii00MyIgeT0iNjAiIHdpZHRoPSI0OCIgaGVpZ2h0PSI4IiByeD0iNCIgZmlsbD0iIzdiMWFkNSIvPgogICAgICA8dGV4dCB5PSI4NCIgZm9udC1zaXplPSI4LjUiIGZpbGw9IiM1YjRiNzQiPmhldXJlcyAvIHNlbWFpbmU8L3RleHQ+CiAgICA8L2c+CiAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MCwyMDYpIj4KICAgICAgPHRleHQgeT0iMzAiIGZvbnQtc2l6ZT0iMTgiPuKame+4jzwvdGV4dD4KICAgICAgPHRleHQgeT0iNTIiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwZjAwMzgiPsOAIGF1dG9tYXRpc2VyPC90ZXh0PgogICAgICA8cmVjdCB4PSItNDMiIHk9IjYwIiB3aWR0aD0iODYiIGhlaWdodD0iOCIgcng9IjQiIGZpbGw9IiM3YjFhZDUiIGZpbGwtb3BhY2l0eT0iLjE4Ii8+PHJlY3QgeD0iLTQzIiB5PSI2MCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjgiIHJ4PSI0IiBmaWxsPSIjN2IxYWQ1Ii8+CiAgICAgIDx0ZXh0IHk9Ijg0IiBmb250LXNpemU9IjguNSIgZmlsbD0iIzViNGI3NCI+aGV1cmVzIC8gc2VtYWluZTwvdGV4dD4KICAgIDwvZz4KICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1MCwyMDYpIj4KICAgICAgPHRleHQgeT0iMzAiIGZvbnQtc2l6ZT0iMTgiPvCfl5HvuI88L3RleHQ+CiAgICAgIDx0ZXh0IHk9IjUyIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMGYwMDM4Ij7DgCBzdXBwcmltZXI8L3RleHQ+CiAgICAgIDxyZWN0IHg9Ii00MyIgeT0iNjAiIHdpZHRoPSI4NiIgaGVpZ2h0PSI4IiByeD0iNCIgZmlsbD0iIzEwQjk4MSIgZmlsbC1vcGFjaXR5PSIuMTgiLz48cmVjdCB4PSItNDMiIHk9IjYwIiB3aWR0aD0iMjQiIGhlaWdodD0iOCIgcng9IjQiIGZpbGw9IiMxMEI5ODEiLz4KICAgICAgPHRleHQgeT0iODQiIGZvbnQtc2l6ZT0iOC41IiBmaWxsPSIjNWI0Yjc0Ij5oZXVyZXMgLyBzZW1haW5lPC90ZXh0PgogICAgPC9nPgogIDwvZz4KCiAgPCEtLSBsZSBwcmVtaWVyIGNoYW50aWVyIC0tPgogIDxnIGZvbnQtZmFtaWx5PSJJbnRlcixzeXN0ZW0tdWksc2Fucy1zZXJpZiI+CiAgICA8cmVjdCB4PSIxNCIgeT0iMzE0IiB3aWR0aD0iMzEyIiBoZWlnaHQ9IjQ4IiByeD0iMTEiIGZpbGw9IiMwZjAwMzgiLz4KICAgIDx0ZXh0IHg9IjE3MCIgeT0iMzM0IiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7wn46vIFVuIHNldWwgcHJlbWllciBjaGFudGllcjwvdGV4dD4KICAgIDx0ZXh0IHg9IjE3MCIgeT0iMzUwIiBmb250LXNpemU9IjkuNSIgZmlsbD0iI2U4YmJmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+bGUgcGx1cyBkJ2hldXJlcyByZW5kdWVzIHBvdXIgbGUgbW9pbnMgZCdlZmZvcnQ8L3RleHQ+CiAgPC9nPgo8L3N2Zz4K" alt=""></div>
+  </div>
+</div>
+
+<div class="content">
+
+<div class="toc"><div class="toc-t">Sommaire du guide</div><div class="toc-g"><a href="#ch0"><span class="tn">00</span><span class="tt">&Agrave; quoi sert cet agent</span></a><a href="#ch1"><span class="tn">01</span><span class="tt">Ce qu'il produit</span></a><a href="#ch2"><span class="tn">02</span><span class="tt">Les 4 briques d'un agent</span></a><a href="#ch3"><span class="tn">03</span><span class="tt">Le prompt d'initialisation</span></a><a href="#ch4"><span class="tn">04</span><span class="tt">Connecter vos outils</span></a><a href="#ch5"><span class="tn">05</span><span class="tt">Le lancer &agrave; la main</span></a><a href="#ch6"><span class="tn">06</span><span class="tt">Le mettre en automatique</span></a><a href="#ch7"><span class="tn">07</span><span class="tt">Ce qu'il ne fait pas</span></a><a href="#ch8"><span class="tn">08</span><span class="tt">Si &ccedil;a ne marche pas</span></a><a href="#ch9"><span class="tn">09</span><span class="tt">R&eacute;cap et exercices</span></a><a href="#ch10"><span class="tn">10</span><span class="tt">Quiz de fin</span></a></div></div>
+
+
+
+
+<!-- ===== CH 00 ===== -->
+<div class="ch" id="ch0">
+  <div class="ch-head"><span class="ch-num">00</span><h2>&Agrave; quoi sert cet agent</h2></div>
+  <div class="card">
+
+    <p>Tout le monde sait qu'il faudrait d&eacute;l&eacute;guer. Peu de gens savent <em>quoi</em>. Parce que pour r&eacute;pondre, il faudrait d'abord savoir o&ugrave; part le temps &mdash; et la r&eacute;ponse de m&eacute;moire est toujours fausse&nbsp;: on surestime ce qui nous a marqu&eacute;s et on oublie tout ce qui a &eacute;t&eacute; r&eacute;p&eacute;titif.</p>
+    <p>Cet agent ne vous demande pas de tenir un relev&eacute; de temps. Il <strong>lit deux semaines d'agenda et de messagerie</strong>, reconstitue o&ugrave; est pass&eacute; le temps, et trie en quatre cases&nbsp;: &agrave; garder, &agrave; d&eacute;l&eacute;guer, &agrave; automatiser, &agrave; supprimer.</p>
+    <p>Chaque ligne cite le rendez-vous ou l'&eacute;change qui l'a produite. Vous pouvez donc contester une ligne&nbsp;: elle n'est pas une impression, elle a une source.</p>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th></th><th>Sans l'agent</th><th>Avec l'agent</th></tr></thead>
+        <tbody>
+          <tr><td>&#8986; O&ugrave; part le temps</td><td>De m&eacute;moire, et donc faux</td><td>Reconstitu&eacute; sur deux semaines r&eacute;elles</td></tr>
+          <tr><td>&#128269; Le tri</td><td>&laquo;&nbsp;Il faudrait que je d&eacute;l&egrave;gue&nbsp;&raquo;</td><td>Quatre cases, chaque t&acirc;che dans une seule</td></tr>
+          <tr><td>&#128202; Le chiffrage</td><td>Absent</td><td>Des heures par semaine, case par case</td></tr>
+          <tr><td>&#127919; Le premier pas</td><td>Tout en m&ecirc;me temps, donc rien</td><td>Un seul chantier&nbsp;: le meilleur rapport heures / effort</td></tr>
+          <tr><td>&#128260; Le suivi</td><td>Jamais mesur&eacute;</td><td>Compar&eacute; au diagnostic pr&eacute;c&eacute;dent</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="analogy">
+      <div class="al">&#128230; L'analogie du d&eacute;m&eacute;nagement</div>
+      <p>Personne ne trie ses affaires en y pensant&nbsp;: on trie en sortant tout des placards. La plupart des objets qu'on jette sont ceux qu'on avait oubli&eacute;s &mdash; on ne pouvait pas d&eacute;cider de s'en s&eacute;parer tant qu'on ne les voyait pas. Deux semaines d'agenda, c'est le placard vid&eacute; sur le sol.</p>
+    </div>
+
+    <div class="tip info">
+      <span class="tip-i">&#128100;</span>
+      <div class="tip-c"><strong>Pour qui c'est fait</strong>Le dirigeant qui a l'impression de ne jamais travailler sur le fond. Celui qui vient d'embaucher et ne sait pas quoi confier. Et celui qui envisage d'automatiser quelque chose sans savoir par quoi commencer.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== CH 01 ===== -->
+<div class="ch" id="ch1">
+  <div class="ch-head"><span class="ch-num">01</span><h2>Ce qu'il produit</h2></div>
+  <div class="card">
+
+    <p>Un livrable&nbsp;: <strong>le diagnostic</strong>. Quatre cases, chiffr&eacute;es, sourc&eacute;es, et un premier chantier d&eacute;sign&eacute;.</p>
+
+    <h3>Les quatre cases</h3>
+    <div class="vg">
+      <div class="vc"><div class="vt">&#128081; &Agrave; garder</div><div class="vd">Le c&oelig;ur du m&eacute;tier&nbsp;: ce que vous seul pouvez faire, et ce que vous avez d&eacute;clar&eacute; &laquo;&nbsp;ne jamais d&eacute;l&eacute;guer&nbsp;&raquo;.</div></div>
+      <div class="vc"><div class="vt">&#129309; &Agrave; d&eacute;l&eacute;guer</div><div class="vd">Ce qu'une autre personne ferait aussi bien, une fois la proc&eacute;dure &eacute;crite.</div></div>
+      <div class="vc"><div class="vt">&#9881;&#65039; &Agrave; automatiser</div><div class="vd">Ce qui est r&eacute;p&eacute;titif, r&eacute;gulier et sans jugement &agrave; porter.</div></div>
+      <div class="vc"><div class="vt">&#128465;&#65039; &Agrave; supprimer</div><div class="vd">La case qu'on n'ose pas ouvrir&nbsp;: la r&eacute;union sans d&eacute;cision, le reporting que personne ne lit.</div></div>
+    </div>
+
+    <h3>Ce que contient chaque ligne</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th>&Eacute;l&eacute;ment</th><th>Pourquoi il est l&agrave;</th></tr></thead>
+        <tbody>
+          <tr><td><strong>La t&acirc;che</strong></td><td>Nomm&eacute;e comme vous la nommez, pas en cat&eacute;gorie abstraite.</td></tr>
+          <tr><td><strong>Le temps estim&eacute;</strong></td><td>En heures par semaine. Sans chiffre, aucune d&eacute;cision n'est possible.</td></tr>
+          <tr><td><strong>La source</strong></td><td>Le rendez-vous ou l'&eacute;change qui a produit la ligne. C'est ce qui vous permet de la contester.</td></tr>
+          <tr><td><strong>La case</strong></td><td>Une seule. Une t&acirc;che &laquo;&nbsp;&agrave; d&eacute;l&eacute;guer ou &agrave; automatiser&nbsp;&raquo; est une t&acirc;che sur laquelle on n'a pas tranch&eacute;.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Le premier chantier</h3>
+    <p>&Agrave; la fin, une seule recommandation&nbsp;: celle qui <strong>rend le plus d'heures pour le moins d'effort</strong>. Pas la plus ambitieuse, pas la plus visible. Un diagnostic qui propose six chantiers ne produit aucun changement&nbsp;; un diagnostic qui en propose un seul en produit parfois.</p>
+
+    <div class="tip err">
+      <span class="tip-i">&#128683;</span>
+      <div class="tip-c"><strong>Ce que vous avez marqu&eacute; &laquo;&nbsp;ne jamais d&eacute;l&eacute;guer&nbsp;&raquo; reste dans &laquo;&nbsp;&agrave; garder&nbsp;&raquo;</strong>Quel que soit le temps que &ccedil;a prend. L'agent ne rediscute pas cette liste&nbsp;: elle rel&egrave;ve d'un choix qui vous appartient, et un outil qui le remettrait en cause &agrave; chaque diagnostic deviendrait vite inutilisable.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== CH 02 ===== -->
+<div class="ch" id="ch2">
+  <div class="ch-head"><span class="ch-num">02</span><h2>Les 4 briques d'un agent</h2></div>
+  <div class="card">
+
+    <p>Un agent n'est pas une bo&icirc;te noire. Il est fait de quatre pi&egrave;ces, et chacune a un r&ocirc;le pr&eacute;cis. Comprendre ces quatre pi&egrave;ces, c'est comprendre les trois agents du kit Organisation.</p>
+
+    <div class="vg">
+      <div class="vc">
+        <div class="vt">&#128220; Le skill</div>
+        <div class="vd">La proc&eacute;dure. Ce que l'agent doit faire, dans quel ordre, et ce qu'il doit produire &agrave; la fin.</div>
+        <div class="ve">Ici&nbsp;: lire, reconstituer, trier, chiffrer, recommander</div>
+      </div>
+      <div class="vc">
+        <div class="vt">&#128214; Le contexte</div>
+        <div class="vd">Le fichier contexte-agent.md. Qui fait quoi, et surtout <strong>ce qui ne doit jamais &ecirc;tre d&eacute;l&eacute;gu&eacute;</strong> &mdash; la ligne qui emp&ecirc;che les recommandations absurdes.</div>
+        <div class="ve">Ex&nbsp;: &laquo;&nbsp;ne jamais d&eacute;l&eacute;guer&nbsp;: les entretiens d'embauche&nbsp;&raquo;</div>
+      </div>
+      <div class="vc">
+        <div class="vt">&#128268; Le connecteur</div>
+        <div class="vd">Le branchement vers l'agenda et la messagerie, <strong>en lecture seule</strong>&nbsp;: c'est la mati&egrave;re premi&egrave;re du diagnostic.</div>
+        <div class="ve">Ex&nbsp;: votre agenda, votre messagerie, votre stockage</div>
+      </div>
+      <div class="vc">
+        <div class="vt">&#9203; La t&acirc;che programm&eacute;e</div>
+        <div class="vd">Le d&eacute;clencheur. Elle transforme un diagnostic ponctuel en mesure r&eacute;p&eacute;t&eacute;e&nbsp;: c'est la comparaison qui dit si quelque chose a chang&eacute;.</div>
+        <div class="ve">Ex&nbsp;: le premier lundi de chaque trimestre</div>
+      </div>
+    </div>
+
+    <div class="flow">
+      <div class="flow-node trigger"><div class="fl">&#128197;</div><div class="fn2">2 semaines</div><div class="fd">Agenda et messagerie</div></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node ai"><div class="fl">&#128269;</div><div class="fn2">Skill</div><div class="fd">Le tri en 4 cases</div></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node"><div class="fl">&#128202;</div><div class="fn2">Le chiffrage</div><div class="fd">Heures par semaine</div></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node action"><div class="fl">&#127919;</div><div class="fn2">Un chantier</div><div class="fd">Le premier seulement</div></div>
+    </div>
+
+    <div class="analogy">
+      <div class="al">&#127869;&#65039; L'analogie de la recette</div>
+      <p>Le <strong>skill</strong>, c'est la recette &eacute;crite. Le <strong>contexte</strong>, ce sont vos interdits&nbsp;: ce qu'on ne met pas dans le plat, quoi qu'il arrive. Les <strong>connecteurs</strong>, ce sont les portes du placard&nbsp;: ici on regarde ce qu'il y a dedans, on ne range rien. La <strong>t&acirc;che programm&eacute;e</strong>, c'est le minuteur trimestriel.</p>
+    </div>
+
+    <div class="tip warn">
+      <span class="tip-i">&#9889;</span>
+      <div class="tip-c"><strong>La ligne &laquo;&nbsp;ne jamais d&eacute;l&eacute;guer&nbsp;&raquo; est ce qui rend l'agent utilisable</strong>Sans elle, il vous proposera t&ocirc;t ou tard de d&eacute;l&eacute;guer la chose &agrave; laquelle vous tenez le plus &mdash; et vous cesserez d'ouvrir ses diagnostics. Prenez le temps de la remplir au d&eacute;marrage.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== CH 03 ===== -->
+<div class="ch" id="ch3">
+  <div class="ch-head"><span class="ch-num">03</span><h2>Le prompt d'initialisation</h2></div>
+  <div class="card">
+    <div class="kitbox">
+      <div class="kl">&#128230; Un kit agent, c'est deux &eacute;l&eacute;ments</div>
+      <ol>
+        <li><strong>Le fichier d'instructions</strong> &mdash; il contient tout&nbsp;: les connecteurs &agrave; brancher, les comp&eacute;tences &agrave; cr&eacute;er, les t&acirc;ches programm&eacute;es. Vous le t&eacute;l&eacute;chargez et vous le d&eacute;posez dans la conversation.</li>
+        <li><strong>Le prompt d'initialisation</strong> &mdash; une seule phrase, qui dit &agrave; Claude de lire ce fichier et d'installer l'agent.</li>
+      </ol>
+    </div>
+
+    <h3>1. T&eacute;l&eacute;chargez le fichier d'instructions</h3>
+    <p><a class="filelink" href="https://drive.google.com/file/d/1_eCTNaAm1MdMexPI9x7QWhjDAl-OV1Ax/view" target="_blank" rel="noopener">&#128196; Agent-diagnostic-delegation-automatisation.md</a></p>
+    <p>Ouvrez une conversation Claude, d&eacute;posez le fichier dedans, puis collez le prompt ci-dessous.</p>
+
+    <h3>2. Collez le prompt d'initialisation</h3>
+    <div class="codewrap"><button class="copybtn" type="button">Copier</button><div class="code">
+Lis le fichier Agent-diagnostic-delegation-automatisation.md que je viens de te d&eacute;poser, et installe l'agent. Dans l'ordre&nbsp;: connecte les MCP qu'il liste, cr&eacute;e les skills qu'il d&eacute;crit en commen&ccedil;ant par le d&eacute;marrage, puis cr&eacute;e les t&acirc;ches programm&eacute;es. Pour chaque &eacute;l&eacute;ment, annonce ce que tu vas faire et attends mon accord avant de cr&eacute;er. S'il manque une information que le fichier ne contient pas, pose-moi la question, une &agrave; la fois, et n'invente aucune valeur. Quand tout est en place, fais-moi un r&eacute;capitulatif de ce qui est connect&eacute;, de ce qui a &eacute;t&eacute; cr&eacute;&eacute;, et de ce qui reste &agrave; faire de mon c&ocirc;t&eacute;.
+    </div></div>
+
+    <div class="tip info">
+      <span class="tip-i">&#128161;</span>
+      <div class="tip-c"><strong>Pourquoi ce prompt est &eacute;crit comme &ccedil;a</strong>Il impose trois choses&nbsp;: un ordre (connecteurs, puis comp&eacute;tences, puis t&acirc;ches), votre accord avant chaque cr&eacute;ation, et l'interdiction d'inventer une valeur manquante. Sans ces trois phrases, Claude installe vite, et vous d&eacute;couvrez les erreurs plus tard.</div>
+    </div>
+
+    <h3>3. Configurez-le&nbsp;: &laquo;&nbsp;d&eacute;marre mon kit organisation&nbsp;&raquo;</h3>
+    <p>L'installation met l'agent en place. La configuration lui dit chez qui il travaille. Elle se fait <strong>une seule fois pour les trois agents du kit Organisation</strong>&nbsp;: si vous l'avez d&eacute;j&agrave; faite, passez au chapitre suivant.</p>
+
+    <div class="prep">
+      <div class="pl">&#128221; Pr&eacute;parez vos r&eacute;ponses avant de lancer</div>
+      <ul>
+        <li>Votre activit&eacute; et la taille de l'&eacute;quipe</li>
+        <li>Qui fait quoi, en une ligne par personne</li>
+        <li>O&ugrave; sont rang&eacute;es les proc&eacute;dures existantes, s'il y en a</li>
+        <li>Les t&acirc;ches que personne d'autre que vous ne sait faire</li>
+        <li>Les outils du quotidien</li>
+        <li><strong>Ce qui ne doit jamais &ecirc;tre d&eacute;l&eacute;gu&eacute;</strong></li>
+      </ul>
+    </div>
+
+    <div class="codewrap"><button class="copybtn" type="button">Copier</button><div class="code">
+d&eacute;marre mon kit organisation
+    </div></div>
+    <p>Les questions suivent une par une. Claude &eacute;crit ensuite <strong>contexte-agent.md</strong>, que les trois comp&eacute;tences relisent &agrave; chaque fois.</p>
+
+    <div class="tip info">
+      <span class="tip-i">&#128161;</span>
+      <div class="tip-c"><strong>&laquo;&nbsp;Ne jamais d&eacute;l&eacute;guer&nbsp;&raquo; n'est pas &laquo;&nbsp;je pr&eacute;f&egrave;re faire moi-m&ecirc;me&nbsp;&raquo;</strong>Ce sont deux listes diff&eacute;rentes, et m&eacute;langer les deux vide l'exercice de son int&eacute;r&ecirc;t. R&eacute;servez la premi&egrave;re &agrave; ce qui engage vraiment&nbsp;: une relation client que vous portez, une d&eacute;cision qui vous revient. Le reste a sa place dans le diagnostic.</div>
+    </div>
+
+    <div class="tip err">
+      <span class="tip-i">&#128274;</span>
+      <div class="tip-c"><strong>Ne donnez jamais de mot de passe ni de cl&eacute; d'API</strong>Le kit ne vous en demandera jamais. Les connexions &agrave; vos outils se font uniquement par les &eacute;crans pr&eacute;vus pour &ccedil;a dans votre application Claude.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== CH 04 ===== -->
+<div class="ch" id="ch4">
+  <div class="ch-head"><span class="ch-num">04</span><h2>Connecter vos outils</h2></div>
+  <div class="card">
+
+    <div class="tools">
+<div class="tool"><span class="tico" style="background:#ffffff;border:1px solid var(--border)"><img class="toolico" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAMAAADVRocKAAABGlBMVEUAAABAgP9DhvVBhvRChfRChfQZZ9IZZ9EZaNMYZtNAivRDhfQaZ9IVatVBhvQZaNJDhfMZaNEaZ9FChfQZZ9L////7vATx9v6myfaCs/Jin+9XmO57rvK41Pj7/f/i7fzG3PmYwPUofOkac+gwgOq00fifxPUhd+l0qvGRu/Tt9P2UvvQleulFjew3heu81vjD2vkzguvp8v34+/7f6/xMku1QlO2GtfMedegsfupTlu5JkO2tzfd/sPKJt/O/2PmNufTX5/s6h+uqy/abwvXJ3vpwqPH0+P4+ieyxz/dtpvBbm+5ene/U5ftlofDN4PoYgDg0qFPqQzXqRDUYgDgXgDgggEAYgDgagDkXgDcAgEAZgTgYgDgYgDg1l7sXAAAAXnRSTlMABGO73///z5tLGM+fDL+7a1Oz79///////////////////////////////////////////////////////////////////////////////////4/bgxDjKM8Ee8PzvzhR0gAAAcJJREFUeAHt1oWu20AQheEppMzthPmEmXOZqQxbhvd/ja59mS1rRhDtbxTtJ1qgWcvlct24eet2JER3TnT33n26rAcPI0eFBmyPHtPFPYlIALandGHPIjKA7Tld1C054AVd1Es54BVdVEQKsMkBDnCAAxzAAYueywEOmEEgFk8kU+lMlk+Wy+djMkC2UIRfqczHVapAXgao4ag6H9RIAlJAE7ZWuwOvLvv1+hADBlUAiSHzaAxgwrbsdA6CwHQeC+wVmwdgpcYibHNCgG24lGO/JADvdwHA8ooccNQEQMx+c635VV6TB9arwAZ7dQesAGQ6AJb4IGFgdaHdgm2ZlYBN+G2xMtAvawHbOzuTImxbSoDXsDkHzI3UAFsBwI4msDsH7MkDw9dNPqgEzIkDayVUY+w3ALAhDrwB8DbLXu8AJMWB93MAxquNRncMW08c4BWc6APLA5zGUaldDYC7e/DrV9TWoo+F5cRWzx0dHTD7wKdzfQ7Yl7MZZcCQLmBIFzCkCxjSBQzpAoZ0AUO6gCFdwJAuYEgXMKQLGLqur+GBQOPTt/BAoPHp+4/wgKEg/fwVFjAUrN9//v4LAxhyuVyz3X/dV4hAn5ff5AAAAABJRU5ErkJggg==" width="22" height="22" alt=""></span><div><div class="tname">Google Agenda<span class="mcp ">MCP natif</span></div><div class="tdesc">Les deux derni&egrave;res semaines de rendez-vous&nbsp;: dur&eacute;es, r&eacute;currences, participants.</div></div></div><div class="tool"><span class="tico" style="background:#ffffff;border:1px solid var(--border)"><img class="toolico" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAEkklEQVR4Ae2ZA5BkSRRFc23bv7H2Fta72V7btm3bDq3tsdkY27b9a9xmTr6IyXB0Z1W/6j8/+56IGzOB1jsdpzp+CQMAAAAAAAAAAAAAAACAEZ53xvDMoz8ekXXMqBGZxyyiDc88pnhExjHvj/S8E0Q7pW7gTtH64h0/ry/ZcVhDyQ6LaPT/+tIdX68ZtEu2aC2js484Uh+7l55qZvUjM4/+btBxhx8o2gnVg3b16kp2+k8fWzU3LeQ3NUjsK1JB/8ZfoI+7QU9ZLjHS84qE4+ij3qyPW66nLLesdsDOyVViZNaR2Toxq+iwyY6yNEiKHYVjqEFi14biHb6joyY7naRZapCwL8TW1qtUR68PYz3vUOEI1HN9yEl6KtVRsoQNw7I9aQ7ZSgmr9GtDnvPJsV+91QuzPl4nPcW1NXmRd5WUoUvSIil3XXvVGX/T8bhGfzHZCJjGKcDPi6lEXqzYl7HQJMmXZ2Xr73uSHh2Oc71sBFQzCzBbtbogts0nSX+fN/t58XL6nrkF0IuxjQCVJgG0+kRu9G2eJPEnJ5Ef/c58r9wCzIIWwJwk/uS4LoA1SfzJcV8Aa5L4k+O+AIYk8SYHAhiSxJAcCEh3knx58p768/9kvhYEtGGSVhdGT/FzY9Poc2/zAp58oMvYYVlZAQngT5LOzd0mOUEKqCzeRd3fRY4ULZH7YYW6+cVJS/qeenYAAtiSZJLzm/lcQQpYNGAfVdjh8uXR/69XVgJol7zrV/1+0W0sAhg2aJ08+8j0J4dfQL8+x6hzO1xbQ8dPSoDZezd+oShJAQugJdbkx4v4k8MvwCTnw+4RZQ6fsgDag48Xq/6nRBgEMCw39jEliS85/AIoObd2yqeD8wigXf36YvXnBTdzCGBYfBgliSE57AIoORd1uJqOzSuAlv/BRvXB9Z9RkngEMCSp2eQwrBXJ4Rdgdt+TgxT9lWQpINRrZXL4BZhd8dYyRX8luS/APjn8Aiz2zk3fUJJcFWCbnOAE0O55aiglyUUBFskJXIBJ0opGSpJjAmyTE7wAs7dv/qaRkuSUAPvkBC+AdssLkxOUJFcEUHKu71RYRQcMhQBawQcbN/4s75kfdgFde2cuOuf/66rpeKESYEZPM+mpZgiPX53Iiz5sDhdaAUJDz/Xp+X5ojp8fn+cXxM4QGicEEPQOF73TFQIB/9GDPUG4JICgp5j8SeJNjjC4KIDgTxJvctwXwJ8k1uS4L4A/SazJcV8AZ5IYkgMBDEliSA4EpD9J8XK9+4UBAtouSfR+Mb1vLAgIaPMk/WafHAjgSpJJzt3CAAGpk8iPSn3UZezJgQB7VsrIgfq4/ZJNDgQw4+fGX6YkWScHAvjx8yMXUJIYkgMBDEliTQ4E8AMBEAABEAABEAABEAABEAABEAABQQEBEDDLQkDlPAhIk4D/rv+rZQEflL8PAekREPv/httFS8h3NuyrD7eMUwAE0PGv7yVskR9tPiHvw4pJbAIgYFqs442HimSQ76gd9evB6zkfVg7T/5ZDQGqHj3S47nn52z27CgAAAAAAAAAAAAAAAAAAtFu2AJlqODQM4+yVAAAAAElFTkSuQmCC" width="22" height="22" alt=""></span><div><div class="tname">Gmail<span class="mcp ">MCP natif</span></div><div class="tdesc">Les deux derni&egrave;res semaines d'&eacute;changes, <strong>en lecture seule</strong>&nbsp;: il ne r&eacute;dige ni n'envoie rien ici.</div></div></div><div class="tool"><span class="tico" style="background:#ffffff;border:1px solid var(--border)"><img class="toolico" src="data:image/png;base64,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" width="22" height="22" alt=""></span><div><div class="tname">Google Drive<span class="mcp ">MCP natif</span></div><div class="tdesc">Le diagnostic produit, et les pr&eacute;c&eacute;dents &mdash; ce sont eux qui rendent la comparaison possible.</div></div></div><div class="tool"><span class="tico" style="background:#ffffff;border:1px solid var(--border)"><img class="toolico" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAACM0lEQVR4nO3cMW5TQRSF4TMzjyjBiRFFvABaJCRKpCCLHVClYgfsAYVFsAI6U1FCg6JEoo9EywZSIBw5cay8uSkghWUKm+bXwPnaae7ot+dpmknTl49CjYhQP9zKZbqopw8+fn8e43F3dHSsty908+aTTrZ3dXA9Uy+p0LOuK9MD/O8cAOYAMAeAOQDMAWAOAHMAmAPAHADmADAHgDkAzAFgDgBzAJgDwBwA5gAwB4A5AMwBYA4AcwCYA8AcAOYAMAeAOQDMAWAOAHMAmAPAHADmADAHgDkAzAFgDgBzAJgDwBwA1kWop4fYwN2sdWUlVEPqk9Q38/aCpG64lZt5V6FWFd3L0qLfW1lM2tsZqKhXSc3sSOqmi3pKD7GBOszKOaUzSdJoFI/Pf68kfb2aaXY9V1X4aLU1pRiPO3qIjY2OI31Y/nZNJirf9pWokf5W0pdoL8C5QodpKUBMVNRgAIMlvf9xQg+xgaqdYdZ8eqZXD19rEiWUlA7Vx2e907ae6FJVqZ2PcKf7wwN6iLXVG2mQpasYSNLSkRN6pl09Vaip62Wny59tXcRyKVK6WFkJXWimXvO23ozrlBq6tkRISkV/+o3/Onbu9tLMnhr6s/6bHADmADAHgDkAzAFgDgBzAJgDwBwA5gAwB4A5AMwBYA4AcwCYA8AcAOYAMAeAOQDMAWAOAHMAmAPAHADmADAHgDkAzAFgDgBzAJgDwBwA5gAwB4A5AMwBYA4AcwCYA8AcAHYLYOlm1RkSAKIAAAAASUVORK5CYII=" width="22" height="22" alt=""></span><div><div class="tname">Microsoft 365<span class="mcp ext">Connecteur officiel</span></div><div class="tdesc">Outlook, Outlook Calendar, SharePoint et OneDrive. Connecteur officiel d'Anthropic, <strong>en lecture par d&eacute;faut</strong>&nbsp;: l'&eacute;criture doit &ecirc;tre valid&eacute;e par un administrateur Microsoft Entra.</div></div></div>
+    </div>
+    <div class="tip info">
+      <span class="tip-i">&#128279;</span>
+      <div class="tip-c"><strong>Deux sortes de connecteurs, &agrave; ne pas confondre</strong><strong style="display:inline;color:inherit">MCP natif</strong>&nbsp;: d&eacute;j&agrave; dans Claude, vous l'activez en un clic (Gmail, Google Drive, Google Sheets, Google Agenda). <strong style="display:inline;color:inherit">MCP officiel</strong>&nbsp;: publi&eacute; par l'&eacute;diteur de l'outil, vous l'ajoutez vous-m&ecirc;me dans Param&egrave;tres &rsaquo; Connecteurs avec l'URL qu'il fournit. Dans les deux cas, c'est votre compte&nbsp;: l'agent ne voit que ce que votre r&ocirc;le vous autorise &agrave; voir.</div>
+    </div>
+
+    <p>C'est le seul agent du kit o&ugrave; les connecteurs servent surtout &agrave; <strong>lire</strong>. Plus la p&eacute;riode lue est repr&eacute;sentative, plus le diagnostic vaut quelque chose.</p>
+
+    <h3>Les trois cat&eacute;gories utilis&eacute;es ici</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Cat&eacute;gorie</th><th>&Agrave; quoi &ccedil;a sert ici</th><th>Options courantes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Agenda</strong></td><td>Reconstituer le temps pass&eacute; en rendez-vous et en r&eacute;unions</td><td>Google Agenda, Outlook Calendar, Infomaniak Calendar, Proton Calendar, Nextcloud Agenda</td></tr>
+          <tr><td><strong>Messagerie</strong></td><td>Rep&eacute;rer les &eacute;changes r&eacute;p&eacute;titifs, en lecture seule</td><td>Gmail, Outlook (connecteur Microsoft 365), Infomaniak Mail, Proton Mail</td></tr>
+          <tr><td><strong>Stockage de fichiers</strong></td><td>Ranger le diagnostic et relire les pr&eacute;c&eacute;dents</td><td>Google Drive, SharePoint, OneDrive, Nextcloud, kDrive, Dropbox</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tip warn">
+      <span class="tip-i">&#128197;</span>
+      <div class="tip-c"><strong>Ce qui n'est pas dans l'agenda n'existe pas pour lui</strong>Le travail de fond que vous faites sans le poser, les interruptions, le temps pass&eacute; &agrave; d&eacute;panner quelqu'un&nbsp;: rien de tout cela n'appara&icirc;t. Si votre agenda ne refl&egrave;te pas vos journ&eacute;es, dites-le-lui&nbsp;: il &eacute;crira &laquo;&nbsp;non mesurable&nbsp;&raquo; et vous posera la question, plut&ocirc;t que d'estimer un volume d'heures qu'il ne peut pas compter.</div>
+    </div>
+
+    <h3>Pourquoi le kit ne nomme jamais un produit</h3>
+    <p>Dans les fichiers du kit, vous croiserez <code>~~agenda</code>, <code>~~messagerie</code> ou <code>~~stockage</code>. Ce sont des emplacements vides, volontairement. Votre fichier de contexte fait la correspondance avec vos outils r&eacute;els.</p>
+
+  </div>
+</div>
+
+<!-- ===== CH 05 ===== -->
+<div class="ch" id="ch5">
+  <div class="ch-head"><span class="ch-num">05</span><h2>Le lancer &agrave; la main</h2></div>
+  <div class="card">
+
+    <h3>La phrase la plus courte</h3>
+    <div class="codewrap"><button class="copybtn" type="button">Copier</button><div class="code">
+qu'est-ce que je devrais arr&ecirc;ter de faire moi-m&ecirc;me&nbsp;?
+    </div></div>
+    <p>Il lit, il trie, il chiffre, et il vous rend quatre cases. Comptez une vingtaine de minutes de lecture et de discussion&nbsp;: la valeur est autant dans ce que vous contestez que dans ce qu'il propose.</p>
+
+    <h3>Choisissez bien les deux semaines</h3>
+    <p>Une p&eacute;riode de cong&eacute;s, un salon, une semaine de cl&ocirc;ture&nbsp;: ces quinze jours-l&agrave; ne ressemblent &agrave; rien d'autre, et le diagnostic qui en sort non plus. Prenez une p&eacute;riode banale, c'est-&agrave;-dire celle que vous auriez envie d'&eacute;carter parce qu'il &laquo;&nbsp;ne s'y est rien pass&eacute; de sp&eacute;cial&nbsp;&raquo;.</p>
+
+    <h3>Comment contester une ligne</h3>
+    <p>Chaque ligne cite sa source&nbsp;: un rendez-vous, un &eacute;change. Ouvrez-la et r&eacute;pondez dans vos mots. &laquo;&nbsp;Ce point hebdomadaire, c'est l&agrave; que je forme l'&eacute;quipe, il reste&nbsp;&raquo;&nbsp;; &laquo;&nbsp;ces mails ont l'air r&eacute;p&eacute;titifs mais chacun demande une d&eacute;cision&nbsp;&raquo;. Il reclasse, et vous pouvez lui demander d'&eacute;crire la r&egrave;gle dans le contexte pour qu'il ne reprenne pas la m&ecirc;me ligne au trimestre suivant.</p>
+
+    <h3>Ce qui va dans &laquo;&nbsp;&agrave; automatiser&nbsp;&raquo;, et ce qui n'y va pas</h3>
+    <div class="vg">
+      <div class="vc"><div class="vt">&#9989; R&eacute;p&eacute;titif et r&eacute;gulier</div><div class="vd">M&ecirc;me geste, m&ecirc;me fr&eacute;quence&nbsp;: un rapport mensuel, un envoi de rappel.</div></div>
+      <div class="vc"><div class="vt">&#9989; Sans jugement &agrave; porter</div><div class="vd">Si la r&eacute;ponse ne d&eacute;pend pas de qui est en face, elle est automatisable.</div></div>
+      <div class="vc"><div class="vt">&#10060; Rare ou irr&eacute;gulier</div><div class="vd">Automatiser ce qui arrive trois fois par an co&ucirc;te plus que &ccedil;a ne rapporte.</div></div>
+      <div class="vc"><div class="vt">&#10060; Une d&eacute;cision &agrave; chaque fois</div><div class="vd">Ce qui ressemble &agrave; de la r&eacute;p&eacute;tition cache souvent un arbitrage. L&agrave;, on d&eacute;l&egrave;gue, on n'automatise pas.</div></div>
+    </div>
+
+    <div class="tip info">
+      <span class="tip-i">&#128161;</span>
+      <div class="tip-c"><strong>La case &laquo;&nbsp;&agrave; supprimer&nbsp;&raquo; est celle qui rend le plus d'heures</strong>Elle ne demande ni formation, ni outil, ni recrutement&nbsp;: seulement une d&eacute;cision. C'est aussi la plus inconfortable, parce qu'il s'agit souvent de quelque chose qu'on a mis en place soi-m&ecirc;me. Commencez par elle.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== CH 06 ===== -->
+<div class="ch" id="ch6">
+  <div class="ch-head"><span class="ch-num">06</span><h2>Le mettre en automatique</h2></div>
+  <div class="card">
+
+    <p>Deux t&acirc;ches&nbsp;: l'une mesure, l'autre alerte.</p>
+
+    <h3>La t&acirc;che trimestrielle &mdash; refaire et comparer</h3>
+    <div class="codewrap"><button class="copybtn" type="button">Copier</button><div class="code">Cr&eacute;e une t&acirc;che programm&eacute;e le premier lundi de chaque trimestre qui refait le diagnostic et le compare au pr&eacute;c&eacute;dent.</div></div>
+    <p>C'est la comparaison qui a de la valeur, pas le diagnostic isol&eacute;. Elle r&eacute;pond &agrave; la seule question qui compte&nbsp;: est-ce que le chantier lanc&eacute; au trimestre dernier a rendu les heures annonc&eacute;es&nbsp;?</p>
+
+    <h3>La t&acirc;che du lundi &mdash; la troisi&egrave;me fois</h3>
+    <div class="codewrap"><button class="copybtn" type="button">Copier</button><div class="code">Cr&eacute;e une t&acirc;che programm&eacute;e chaque lundi &agrave; 9h qui me signale les t&acirc;ches r&eacute;p&eacute;titives de la semaine pass&eacute;e qui reviennent pour la troisi&egrave;me fois sans &ecirc;tre ni d&eacute;l&eacute;gu&eacute;es ni automatis&eacute;es.</div></div>
+    <p>Trois fois, c'est le seuil &agrave; partir duquel une t&acirc;che cesse d'&ecirc;tre un cas particulier. En dessous, on l'absorbe sans y penser&nbsp;; au-del&agrave;, elle devient une habitude qu'on ne questionne plus.</p>
+
+    <h3>G&eacute;rer vos t&acirc;ches</h3>
+    <div class="vg">
+      <div class="vc"><div class="vt">&#128203; Les lister</div><div class="vd">&laquo;&nbsp;montre-moi mes t&acirc;ches programm&eacute;es&nbsp;&raquo;</div></div>
+      <div class="vc"><div class="vt">&#128336; En d&eacute;caler une</div><div class="vd">&laquo;&nbsp;passe le diagnostic au premier lundi du mois&nbsp;&raquo;</div></div>
+      <div class="vc"><div class="vt">&#9199;&#65039; En suspendre une</div><div class="vd">&laquo;&nbsp;mets en pause l'alerte du lundi&nbsp;&raquo;</div></div>
+      <div class="vc"><div class="vt">&#128465;&#65039; En supprimer une</div><div class="vd">&laquo;&nbsp;supprime le diagnostic trimestriel&nbsp;&raquo;</div></div>
+    </div>
+
+    <div class="tip warn">
+      <span class="tip-i">&#9889;</span>
+      <div class="tip-c"><strong>Un chantier &agrave; la fois, et jusqu'au bout</strong>La tentation apr&egrave;s un diagnostic est de lancer les quatre cases en m&ecirc;me temps. Un trimestre plus tard, aucune n'est termin&eacute;e et le diagnostic suivant ressemble au premier. Un seul chantier men&eacute; &agrave; son terme change le diagnostic suivant&nbsp;; c'est le but.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== CH 07 ===== -->
+<div class="ch" id="ch7">
+  <div class="ch-head"><span class="ch-num">07</span><h2>Ce qu'il ne fait pas</h2></div>
+  <div class="card">
+
+    <p>Cinq interdits, &eacute;crits dans le fichier d'instructions. Ils ne se configurent pas.</p>
+
+    <div class="vg">
+      <div class="vc"><div class="vt">&#128683; Il ne touche pas &agrave; ce que vous avez prot&eacute;g&eacute;</div><div class="vd">Ce qui est marqu&eacute; &laquo;&nbsp;ne jamais d&eacute;l&eacute;guer&nbsp;&raquo; reste dans &laquo;&nbsp;&agrave; garder&nbsp;&raquo;, quel que soit le temps que &ccedil;a prend.</div></div>
+      <div class="vc"><div class="vt">&#128683; Il n'&eacute;crit rien dans votre messagerie</div><div class="vd">Elle est lue en lecture seule&nbsp;: aucun message, aucun brouillon.</div></div>
+      <div class="vc"><div class="vt">&#128683; Il ne cite aucun contenu d'&eacute;change priv&eacute;</div><div class="vd">Dans le diagnostic, il nomme le sujet et le temps pass&eacute; &mdash; jamais ce qui a &eacute;t&eacute; &eacute;crit dans l'&eacute;change.</div></div>
+      <div class="vc"><div class="vt">&#128683; Il n'invente aucune heure</div><div class="vd">Le temps est compt&eacute; sur l'agenda et les &eacute;changes r&eacute;els. Ce qui n'est pas trac&eacute; est &eacute;crit &laquo;&nbsp;non mesurable&nbsp;&raquo;, pas estim&eacute;.</div></div>
+      <div class="vc"><div class="vt">&#128683; Il n'avance aucune ligne sans source</div><div class="vd">Chaque recommandation cite le rendez-vous ou l'&eacute;change qui l'a produite.</div></div>
+    </div>
+
+    <h3>Il ne d&eacute;cide ni d'un recrutement ni d'un outil</h3>
+    <p>&laquo;&nbsp;&Agrave; d&eacute;l&eacute;guer&nbsp;&raquo; ne veut pas dire &laquo;&nbsp;embauchez&nbsp;&raquo;, et &laquo;&nbsp;&agrave; automatiser&nbsp;&raquo; ne d&eacute;signe aucun logiciel &agrave; acheter. Ces d&eacute;cisions d&eacute;pendent de votre tr&eacute;sorerie, de vos projets et de gens que l'agent ne conna&icirc;t pas. Il dit o&ugrave; part le temps&nbsp;; il ne dit pas comment d&eacute;penser votre argent.</p>
+
+    <div class="tip info">
+      <span class="tip-i">&#128161;</span>
+      <div class="tip-c"><strong>Et ce qu'il ne remplace pas</strong>D&eacute;l&eacute;guer suppose une proc&eacute;dure &eacute;crite, sinon la t&acirc;che revient au bout de trois semaines. Le diagnostic dit quoi d&eacute;l&eacute;guer&nbsp;; l'agent <em>Proc&eacute;dure interne</em> rend la d&eacute;l&eacute;gation possible. Les deux vont ensemble.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== CH 08 ===== -->
+<div class="ch" id="ch8">
+  <div class="ch-head"><span class="ch-num">08</span><h2>Si &ccedil;a ne marche pas</h2></div>
+  <div class="card">
+
+    <h3>Le diagnostic ne ressemble pas &agrave; mes journ&eacute;es</h3>
+    <p>C'est presque toujours que l'agenda ne les refl&egrave;te pas. Le travail de fond non pos&eacute;, les interruptions, le d&eacute;pannage&nbsp;: rien n'y figure. Dites-le-lui en une phrase &mdash; &laquo;&nbsp;j'ai environ deux heures par jour d'interruptions qui ne sont nulle part&nbsp;&raquo; &mdash; et relancez.</p>
+
+    <h3>Il me propose de d&eacute;l&eacute;guer ce que je ne veux pas l&acirc;cher</h3>
+    <p>La ligne &laquo;&nbsp;ne jamais d&eacute;l&eacute;guer&nbsp;&raquo; du contexte est vide ou trop &eacute;troite. Compl&eacute;tez-la, puis demandez-lui de refaire le tri&nbsp;: la ligne dispara&icirc;t de &laquo;&nbsp;&agrave; d&eacute;l&eacute;guer&nbsp;&raquo; et n'y reviendra plus.</p>
+
+    <h3>Les quatre cases sont trop pleines, je ne sais pas par o&ugrave; commencer</h3>
+    <p>C'est le sympt&ocirc;me d'un diagnostic qu'on lit comme une liste de courses. Demandez&nbsp;: &laquo;&nbsp;garde uniquement le premier chantier et dis-moi ce qu'il me rend&nbsp;&raquo;. Le reste attend le trimestre suivant, et ce n'est pas grave.</p>
+
+    <h3>Deux semaines, c'est trop court</h3>
+    <p>Souvent, oui, pour une activit&eacute; tr&egrave;s saisonni&egrave;re. Demandez une p&eacute;riode plus longue ou deux p&eacute;riodes espac&eacute;es&nbsp;: &laquo;&nbsp;fais le diagnostic sur mars et sur juin, et compare&nbsp;&raquo;. L'&eacute;cart entre les deux est en soi un r&eacute;sultat.</p>
+
+    <h3>Je suis seul&nbsp;: &agrave; qui je d&eacute;l&eacute;guerais&nbsp;?</h3>
+    <p>La case &laquo;&nbsp;&agrave; d&eacute;l&eacute;guer&nbsp;&raquo; devient alors une liste d'arguments, chiffr&eacute;s en heures, pour un premier recrutement ou une prestation externe. Et les cases &laquo;&nbsp;automatiser&nbsp;&raquo; et &laquo;&nbsp;supprimer&nbsp;&raquo;, elles, sont imm&eacute;diatement actionnables.</p>
+
+    <h3>Le r&eacute;flexe qui r&egrave;gle le reste</h3>
+    <p>Dites-lui ce qui ne va pas, en langage courant. &laquo;&nbsp;Ce rendez-vous n'est pas une r&eacute;union, c'est de la vente&nbsp;&raquo;, &laquo;&nbsp;tu as compt&eacute; deux fois le m&ecirc;me dossier&nbsp;&raquo;, &laquo;&nbsp;chiffre en heures par mois plut&ocirc;t que par semaine&nbsp;&raquo;. Il corrige, et si la remarque vaut toujours, demandez-lui de l'&eacute;crire dans le contexte.</p>
+
+  </div>
+</div>
+
+<!-- ===== CH 09 ===== -->
+<div class="ch" id="ch9">
+  <div class="ch-head"><span class="ch-num">09</span><h2>R&eacute;cap et exercices</h2></div>
+  <div class="card">
+
+    <h3>Ce que vous savez maintenant faire</h3>
+    <div class="vg">
+      <div class="vc"><div class="vt">&#9989; Installer l'agent</div><div class="vd">D&eacute;poser le fichier d'instructions, coller le prompt d'initialisation, valider chaque cr&eacute;ation.</div></div>
+      <div class="vc"><div class="vt">&#9989; Reconna&icirc;tre les 4 briques</div><div class="vd">Skill, contexte, connecteur, t&acirc;che programm&eacute;e.</div></div>
+      <div class="vc"><div class="vt">&#9989; Prot&eacute;ger ce qui doit l'&ecirc;tre</div><div class="vd">La ligne &laquo;&nbsp;ne jamais d&eacute;l&eacute;guer&nbsp;&raquo;, et la diff&eacute;rence avec &laquo;&nbsp;je pr&eacute;f&egrave;re faire moi-m&ecirc;me&nbsp;&raquo;.</div></div>
+      <div class="vc"><div class="vt">&#9989; Lire les quatre cases</div><div class="vd">Garder, d&eacute;l&eacute;guer, automatiser, supprimer &mdash; une t&acirc;che dans une seule case.</div></div>
+      <div class="vc"><div class="vt">&#9989; Contester une ligne</div><div class="vd">Ouvrir la source cit&eacute;e, r&eacute;pondre, faire &eacute;crire la r&egrave;gle dans le contexte.</div></div>
+      <div class="vc"><div class="vt">&#9989; Passer en automatique</div><div class="vd">Cr&eacute;er, lister, d&eacute;caler et supprimer une t&acirc;che.</div></div>
+    </div>
+
+    <h3>Exercices pratiques</h3>
+    <p>Quatre exercices de difficult&eacute; croissante.</p>
+    <div class="ex">
+      <div class="exh"><span class="exb easy">&#128994; Facile</span> &mdash; L'estimation &agrave; l'aveugle <span class="exd">(&asymp; 20 min)</span></div>
+      <p>&Eacute;crivez d'abord, sans rien ouvrir, o&ugrave; vous croyez que part votre temps. Lancez ensuite le diagnostic et comparez. L'&eacute;cart est l'int&eacute;r&ecirc;t de l'exercice.</p>
+    </div>
+    <div class="ex">
+      <div class="exh"><span class="exb med">&#128993; Moyen</span> &mdash; La case &laquo;&nbsp;supprimer&nbsp;&raquo; <span class="exd">(&asymp; 25 min)</span></div>
+      <p>Ne regardez que cette case et tranchez ligne par ligne&nbsp;: on arr&ecirc;te, ou on garde et on dit pourquoi. C'est la case qui rend des heures sans rien co&ucirc;ter.</p>
+    </div>
+    <div class="ex">
+      <div class="exh"><span class="exb hard">&#128308; Difficile</span> &mdash; Le chantier men&eacute; &agrave; son terme <span class="exd">(&asymp; un trimestre)</span></div>
+      <p>Prenez le premier chantier recommand&eacute; et menez-le jusqu'au bout, seul, sans en lancer d'autre. Refaites le diagnostic au trimestre suivant et regardez si les heures sont revenues.</p>
+    </div>
+    <div class="ex">
+      <div class="exh"><span class="exb expl">&#128995; Exploration</span> &mdash; Les deux p&eacute;riodes <span class="exd">(&asymp; 30 min)</span></div>
+      <p>Demandez le diagnostic sur deux p&eacute;riodes &eacute;loign&eacute;es de l'ann&eacute;e et comparez-les. Ce qui appara&icirc;t dans les deux est structurel&nbsp;; ce qui n'appara&icirc;t que dans une est conjoncturel, et ne se traite pas pareil.</p>
+    </div>
+
+    <div class="tip info">
+      <span class="tip-i">&#128640;</span>
+      <div class="tip-c"><strong>Et maintenant&nbsp;?</strong><strong style="display:inline;color:inherit">Diagnostic d&eacute;l&eacute;gation et automatisation</strong> est le troisi&egrave;me des trois agents du kit Organisation. Vous avez la cha&icirc;ne compl&egrave;te&nbsp;: celui-ci dit <em>quoi</em> sortir de vos mains, <strong style="display:inline;color:inherit">Proc&eacute;dure interne</strong> rend la d&eacute;l&eacute;gation possible, et <strong style="display:inline;color:inherit">Passation avant absence</strong> s'appuie sur les deux. Les trois lisent le m&ecirc;me contexte.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="ch" id="ch10">
+  <div class="ch-head"><span class="ch-num">10</span><h2>Quiz de fin</h2></div>
+  <div class="card">
+    <p>Trois questions pour v&eacute;rifier que l'essentiel est pass&eacute;. Cliquez sur la r&eacute;ponse qui vous semble juste&nbsp;: la correction s'affiche aussit&ocirc;t.</p>
+    <div class="quiz"><div class="q"><div class="qq"><span class="qn">Q1</span>Une t&acirc;che que vous avez marqu&eacute;e &laquo;&nbsp;ne jamais d&eacute;l&eacute;guer&nbsp;&raquo; prend huit heures par semaine. O&ugrave; la classe-t-il&nbsp;?</div><button class="opt" type="button" data-ok="0">Dans &laquo;&nbsp;&agrave; d&eacute;l&eacute;guer&nbsp;&raquo;, vu le temps qu'elle prend</button><button class="opt" type="button" data-ok="1">Dans &laquo;&nbsp;&agrave; garder&nbsp;&raquo;, quel que soit le temps</button><button class="opt" type="button" data-ok="0">Dans &laquo;&nbsp;&agrave; automatiser&nbsp;&raquo;</button><div class="exp">L'agent ne rediscute jamais cette liste&nbsp;: elle rel&egrave;ve d'un choix qui vous appartient. Un outil qui la remettrait en cause &agrave; chaque diagnostic cesserait vite d'&ecirc;tre ouvert.</div></div><div class="q"><div class="qq"><span class="qn">Q2</span>Quelle t&acirc;che ne doit PAS aller dans &laquo;&nbsp;&agrave; automatiser&nbsp;&raquo;&nbsp;?</div><button class="opt" type="button" data-ok="0">Un rapport mensuel toujours identique</button><button class="opt" type="button" data-ok="1">Une r&eacute;ponse qui d&eacute;pend de qui est en face</button><button class="opt" type="button" data-ok="0">Un rappel envoy&eacute; chaque vendredi</button><div class="exp">Ce qui ressemble &agrave; de la r&eacute;p&eacute;tition cache souvent un arbitrage. D&egrave;s qu'il y a un jugement &agrave; porter, on d&eacute;l&egrave;gue &mdash; on n'automatise pas.</div></div><div class="q"><div class="qq"><span class="qn">Q3</span>Pourquoi chaque ligne du diagnostic cite-t-elle sa source&nbsp;?</div><button class="opt" type="button" data-ok="0">Pour allonger le document</button><button class="opt" type="button" data-ok="1">Pour que vous puissiez la contester et la faire reclasser</button><button class="opt" type="button" data-ok="0">Pour prouver que l'agent a bien lu l'agenda</button><div class="exp">Une ligne sourc&eacute;e n'est pas une impression&nbsp;: vous ouvrez le rendez-vous ou l'&eacute;change cit&eacute;, vous r&eacute;pondez dans vos mots, il reclasse, et la r&egrave;gle peut passer dans le contexte.</div></div></div>
+    <div class="qscore">Score : 0 / 0</div>
+  </div>
+</div>
+<div class="footer">
+  <p><strong>&#128218; Guide agent &mdash; Diagnostic d&eacute;l&eacute;gation et automatisation</strong></p>
+  <p>Kit Organisation &middot; Formation Studeria &middot; Octobre 2026</p>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+
+<button class="top" aria-label="Haut de page">&#8593;</button>
+
+<script>
+(function(){
+  var bar=document.querySelector('.progress'),top=document.querySelector('.top');
+  var links=[].slice.call(document.querySelectorAll('.sidebar a[href^="#"]'));
+  var chs=[].slice.call(document.querySelectorAll('.ch'));
+  function onScroll(){
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(h>0?window.scrollY/h*100:0)+'%';
+    top.classList.toggle('show',window.scrollY>600);
+    var cur=null;
+    chs.forEach(function(c){if(c.getBoundingClientRect().top<160)cur=c.id});
+    links.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+cur)});
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  top.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target)}})},
+      {rootMargin:'0px 0px -60px 0px'});
+    chs.forEach(function(c){io.observe(c)});
+  } else { chs.forEach(function(c){c.classList.add('vis')}); }
+  links.forEach(function(a){a.addEventListener('click',function(){
+    document.querySelector('.sidebar').classList.remove('open')})});
+
+  /* bouton copier */
+  document.querySelectorAll('.copybtn').forEach(function(b){
+    b.addEventListener('click',function(){
+      var code=b.parentNode.querySelector('.code');
+      var t=code.innerText.replace(/^\/\/.*\n?/,'').trim();
+      var done=function(){b.textContent='Copie !';b.classList.add('done');
+        setTimeout(function(){b.textContent='Copier';b.classList.remove('done')},2000)};
+      if(navigator.clipboard&&window.isSecureContext){
+        navigator.clipboard.writeText(t).then(done,fallback);
+      } else { fallback(); }
+      function fallback(){
+        var ta=document.createElement('textarea');ta.value=t;
+        ta.style.position='fixed';ta.style.opacity=0;document.body.appendChild(ta);
+        ta.select();try{document.execCommand('copy');done()}catch(e){}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+
+  /* quiz */
+  var qz=document.querySelector('.quiz');
+  if(qz){
+    var total=qz.querySelectorAll('.q').length,good=0,done=0;
+    var sc=document.querySelector('.qscore');
+    qz.querySelectorAll('.q').forEach(function(q){
+      q.querySelectorAll('button.opt').forEach(function(b){
+        b.addEventListener('click',function(){
+          if(q.classList.contains('answered'))return;
+          q.classList.add('answered');done++;
+          var ok=b.dataset.ok==='1';if(ok)good++;
+          b.classList.add(ok?'good':'bad');
+          if(!ok)q.querySelector('button.opt[data-ok="1"]').classList.add('good');
+          if(sc)sc.textContent=done<total?('Score : '+good+' / '+done+'  \u2014  '+(total-done)+' question(s) restante(s)')
+            :('Score final : '+good+' / '+total+(good===total?'  \u2014  parfait !':'  \u2014  relisez les chapitres concernes.'));
+        });
+      });
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
